@@ -5,11 +5,6 @@ public class FileHandler {
     public String rootPath;
     public File rootFile;
 
-    public FileHandler() {
-        rootPath = "/";
-        rootFile = new File(rootPath);
-    }
-
     public FileHandler(String path) {
         rootPath = path;
         rootFile = new File(rootPath);

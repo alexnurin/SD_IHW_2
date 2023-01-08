@@ -15,5 +15,7 @@ public class Main {
         for (File f : res) {
             System.out.println(f.getName());
         }
+        Graph graph = new Graph(res, inputPath);
+
     }
 }
