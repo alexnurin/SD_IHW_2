@@ -11,7 +11,7 @@ public class Main {
             throw new MissingFormatArgumentException("Wrong input path\n");
         }
         FileHandler fileHandler = new FileHandler(inputPath);
-        var res = fileHandler.listFiles();
+        var res = fileHandler.txtCollector(fileHandler.rootFile);
         for (File f : res) {
             System.out.println(f.getName());
         }
