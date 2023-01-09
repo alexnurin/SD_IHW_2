@@ -12,18 +12,18 @@ public class Main {
         if (!inputPath.endsWith("\\")) {
             inputPath = inputPath + "\\";
         }
-        if (!FileHandler.pathIsCorrect(inputPath)) {
+        if (!FileHandler.pathIsCorrect(inputPath)) {    // путь существует и содержит файлы
             throw new MissingFormatArgumentException("Not found any txt files. Try another path.");
         }
         FileHandler fileHandler = new FileHandler(inputPath);
-        var collectedTxt = fileHandler.txtCollector(fileHandler.rootFile);
+        var collectedTxt = fileHandler.txtCollector(fileHandler.rootFile); // сбор всех анализируемых файлов
         for (File f : collectedTxt) {
             System.out.println(f.getName() + " found.");
         }
         Graph graph = new Graph(collectedTxt, inputPath);
-        graph.topologicalSortHandler();
+        graph.topologicalSort();
         Stack<File> sortedFiles = graph.getSortedFiles();
-        if (graph.Cycles()){
+        if (graph.Cycles()) {
             System.out.println("Cycle detected in dependencies. Problem is between files " + graph.problemFiles() + ".\n");
             return;
         }

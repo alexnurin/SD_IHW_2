@@ -2,6 +2,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+/**
+ * Класс, предназначенный для упорядочивания файлов в зависимости от require-строк путём топологической сортировки.
+ *
+ */
 public class Graph {
     private final String dirPath;
     private final Vector<File> files;
@@ -10,14 +14,29 @@ public class Graph {
     private File problemFile1;
     private File problemFile2;
 
-    public String problemFiles(){
+    /**
+     * Инкапсуляция доступа к файлам, конфликтующих в require
+     * @return Строку с названиями файлов
+     */
+    public String problemFiles() {
         return problemFile1.getName() + " and " + problemFile2.getName();
     }
+
     private boolean cycles = false;
-    public boolean Cycles (){
+
+    /**
+     * Инкапсуляция доступа к cycles
+     * @return cycles
+     */
+    public boolean Cycles() {
         return cycles;
     }
 
+    /**
+     * Поиск "предков" файла - других файлов, указанных в его require. Некорректные require игнорируются.
+     * @param file Исследуемый файл.
+     * @return Вектор файлов - предки исследуемого.
+     */
     private Vector<File> getParents(File file) {
         Vector<File> parents = new Vector<>();
         try {
@@ -38,6 +57,11 @@ public class Graph {
         return parents;
     }
 
+    /**
+     * Конструктор.
+     * @param txtFiles Вектор файлов.
+     * @param path Путь к корневой папке.
+     */
     public Graph(Vector<File> txtFiles, String path) {
         files = txtFiles;
         dirPath = path;
@@ -45,11 +69,18 @@ public class Graph {
         numberInGraph = new HashMap<>();
     }
 
+    /**
+     * Запрос на вывод файлов в корректном порядке.
+     * @return Осортированные топологически файлы.
+     */
     public Stack<File> getSortedFiles() {
         buildGraph();
-        return topologicalSortHandler();
+        return topologicalSort();
     }
 
+    /**
+     * Построение графа путем перевода файлов в целые числа (вершины) и сохранение списка смежности между ними.
+     */
     public void buildGraph() {
         AdjList.setSize(files.size());
         for (int i = 0; i < files.size(); i++) {
@@ -65,20 +96,28 @@ public class Graph {
         }
     }
 
+    /**
+     * Рекурсивная итерация топологической сортировки.
+     * @param node Текущая вершина графа.
+     * @param visited Массив посещений.
+     * @param stack Ссылка на стек обработанных вершин.
+     */
     void topologicalSortIteration(int node, boolean[] visited, Stack<Integer> stack) {
-        //  Помечаем текущий узел как посещенный
         visited[node] = true;
 
-        // Рекурсивно вызываем функцию для всех смежных вершин
         for (Integer integer : AdjList.get(node)) {
             if (!visited[integer]) {
                 topologicalSortIteration(integer, visited, stack);
             }
         }
-        // Добавляем текущую вершину в стек с результатом
         stack.push(node);
     }
 
+    /**
+     * Конвертация + ревёрс целочисленного стека в стек файлов.
+     * @param stack Целочисленный стек.
+     * @return Стек файлов.
+     */
     Stack<File> integersToFiles(Stack<Integer> stack) {
         Stack<File> sortedFiles = new Stack<>();
         while (!stack.empty()) {
@@ -87,31 +126,38 @@ public class Graph {
         return sortedFiles;
     }
 
-    Stack<File> topologicalSortHandler() {
+    /**
+     * Топологическая сортировка файлов в зависимости от require-строчек.
+     * @return Стек файлов в корректном порядке для конкатенации.
+     */
+    Stack<File> topologicalSort() {
         Stack<Integer> stack = new Stack<>();
 
-        // Помечаем все вершины как непосещенные
         boolean[] colour = new boolean[AdjList.size()];
         for (int i = 0; i < AdjList.size(); i++) {
             colour[i] = false;
         }
-        // Вызываем рекурсивную вспомогательную функцию
-        // для поиска топологической сортировки для каждой вершины
+
         for (int i = 0; i < AdjList.size(); i++) {
             if (!colour[i]) {
                 topologicalSortIteration(i, colour, stack);
             }
         }
-        if (check_cycle(stack)){
+        if (check_cycle(stack)) {
             return new Stack<>();
         }
         return integersToFiles(stack);
     }
 
+    /**
+     * Проверка на циклы путём поиска противоречий в псевдо-топологически отсортированном списке вершин.
+     * @param numbers Стек чисел - упорядоченные вершины графа.
+     * @return true если цикл найден.
+     */
     boolean check_cycle(Stack<Integer> numbers) {
         for (int startNode = 0; startNode < AdjList.size(); startNode++) {
-            for (Integer targetNode : AdjList.get(startNode)){
-                if (numbers.indexOf(targetNode) > numbers.indexOf(startNode)){
+            for (Integer targetNode : AdjList.get(startNode)) {
+                if (numbers.indexOf(targetNode) > numbers.indexOf(startNode)) {
                     cycles = true;
                     problemFile1 = files.get(startNode);
                     problemFile2 = files.get(targetNode);

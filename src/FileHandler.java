@@ -3,15 +3,27 @@ import java.util.Objects;
 import java.util.Stack;
 import java.util.Vector;
 
+/**
+ * Класс, предназначенный для обработки файлов: поиска, конкатенации и вывода.
+ */
 public class FileHandler {
     public String rootPath;
     public File rootFile;
 
+    /**
+     * Constructor
+     * @param path путь к корневой рабочей папке
+     */
     public FileHandler(String path) {
         rootPath = path;
         rootFile = new File(rootPath);
     }
 
+    /**
+     *
+     * @param path анализируемый путь
+     * @return true если путь существует и содержит хотя бы один файл
+     */
     public static boolean pathIsCorrect(String path) {
         try {
             File test = new File(path);
@@ -25,6 +37,11 @@ public class FileHandler {
         return true;
     }
 
+    /**
+     * Находит все файлы в папке и её подпапках.
+     * @param filePath путь до исследуемой папки (вызывается рекурсивно от подпапок)
+     * @return вектор найденных файлов
+     */
     public Vector<File> txtCollector(File filePath) {
         File[] files = filePath.listFiles();
         Vector<File> txtFiles = new Vector<>();
@@ -38,17 +55,22 @@ public class FileHandler {
             if (file.isDirectory()) {
                 txtFiles.addAll(txtCollector(file));
             }
-            if (txtFiles.size() > 200){
+            if (txtFiles.size() > 500){
                 throw new OutOfMemoryError("Directory is too large.");
             }
         }
         return txtFiles;
     }
 
+    /**
+     *
+     * @param files Стек файлов, упорядоченных для вывода
+     * @throws IOException Ошибка при чтении из файлов или записи в файлы.
+     */
     public void concatenateFiles(Stack<File> files) throws IOException {
         PrintWriter out = null;
         try {
-            PrintWriter clearer = new PrintWriter(".out.txt");
+            PrintWriter clearer = new PrintWriter(".out.txt"); // очистить файл перед выводом
             clearer.close();
             FileWriter outStream = new FileWriter(".out.txt", true);
             out = new PrintWriter(outStream);
@@ -58,7 +80,7 @@ public class FileHandler {
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
                 String ls = System.getProperty("line.separator");
-                while ((line = reader.readLine()) != null) {
+                while ((line = reader.readLine()) != null) {    // выводить содержимое файолов в заданном порядке
                     stringBuilder.append(line);
                     stringBuilder.append(ls);
                 }
