@@ -1,4 +1,5 @@
-import java.io.File;
+import java.io.*;
+import java.util.Stack;
 import java.util.Vector;
 
 public class FileHandler {
@@ -31,7 +32,34 @@ public class FileHandler {
         return txtFiles;
     }
 
-    public File[] listFiles() {
-        return rootFile.listFiles();
+    public void concatenateFiles(Stack<File> files) throws IOException {
+        PrintWriter out = null;
+        try {
+            FileWriter outStream = new FileWriter("out.txt", true);
+            out = new PrintWriter(outStream);
+            while (!files.empty()) {
+                File file = files.pop();
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                String ls = System.getProperty("line.separator");
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                    stringBuilder.append(ls);
+                }
+                // delete the last new line separator
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                reader.close();
+
+                String content = stringBuilder.toString();
+                out.write(content);
+            }
+        } catch (IOException e) {
+            System.err.println("Error: " + e.getMessage());
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
     }
 }

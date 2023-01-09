@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.util.MissingFormatArgumentException;
 import java.util.Scanner;
 import java.util.Stack;
@@ -18,6 +19,12 @@ public class Main {
         }
         Graph graph = new Graph(collectedTxt, inputPath);
         graph.topologicalSortHandler();
-        Stack<Integer> sortedFiles = graph.getSortedFiles();
+        Stack<File> sortedFiles = graph.getSortedFiles();
+
+        try {
+            fileHandler.concatenateFiles(sortedFiles);
+        } catch (IOException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
     }
 }

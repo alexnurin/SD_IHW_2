@@ -3,10 +3,10 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Graph {
-    private String dirPath;
-    private Vector<File> files;
-    private Vector<Vector<Integer>> AdjList;
-    private HashMap<File, Integer> numberInGraph;
+    private final String dirPath;
+    private final Vector<File> files;
+    private final Vector<Vector<Integer>> AdjList;
+    private final HashMap<File, Integer> numberInGraph;
 
     private Vector<File> getParents(File file) {
         Vector<File> parents = new Vector<>();
@@ -39,7 +39,7 @@ public class Graph {
         }
     }
 
-    public Stack<Integer> getSortedFiles(){
+    public Stack<File> getSortedFiles(){
         buildGraph();
         return topologicalSortHandler();
     }
@@ -81,7 +81,15 @@ public class Graph {
         stack.push(node);
     }
 
-    Stack<Integer> topologicalSortHandler() {
+    Stack<File> integersToFiles(Stack<Integer> stack){
+        Stack <File> sortedFiles = new Stack<>();
+        while (!stack.empty()){
+            sortedFiles.push(files.get(stack.pop()));
+        }
+        return sortedFiles;
+    }
+
+    Stack<File> topologicalSortHandler() {
         Stack<Integer> stack = new Stack<>();
 
         // Помечаем все вершины как непосещенные
@@ -96,6 +104,6 @@ public class Graph {
                 topologicalSortIteration(i, colour, stack);
             }
         }
-        return stack;
+        return integersToFiles(stack);
     }
 }
