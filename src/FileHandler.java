@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -12,6 +13,15 @@ public class FileHandler {
     }
 
     public static boolean pathIsCorrect(String path) {
+        try {
+            File test = new File(path);
+            if (test.listFiles() == null || Objects.requireNonNull(test.listFiles()).length == 0){
+                return false;
+            }
+        }
+        catch (Exception e){
+            return false;
+        }
         return true;
     }
 
@@ -28,6 +38,9 @@ public class FileHandler {
             if (file.isDirectory()) {
                 txtFiles.addAll(txtCollector(file));
             }
+            if (txtFiles.size() > 200){
+                throw new OutOfMemoryError("Directory is too large.");
+            }
         }
         return txtFiles;
     }
@@ -35,7 +48,9 @@ public class FileHandler {
     public void concatenateFiles(Stack<File> files) throws IOException {
         PrintWriter out = null;
         try {
-            FileWriter outStream = new FileWriter("out.txt", true);
+            PrintWriter clearer = new PrintWriter(".out.txt");
+            clearer.close();
+            FileWriter outStream = new FileWriter(".out.txt", true);
             out = new PrintWriter(outStream);
             while (!files.empty()) {
                 File file = files.pop();
@@ -47,7 +62,6 @@ public class FileHandler {
                     stringBuilder.append(line);
                     stringBuilder.append(ls);
                 }
-                // delete the last new line separator
                 stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                 reader.close();
 

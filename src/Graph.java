@@ -7,6 +7,16 @@ public class Graph {
     private final Vector<File> files;
     private final Vector<Vector<Integer>> AdjList;
     private final HashMap<File, Integer> numberInGraph;
+    private File problemFile1;
+    private File problemFile2;
+
+    public String problemFiles(){
+        return problemFile1.getName() + " and " + problemFile2.getName();
+    }
+    private boolean cycles = false;
+    public boolean Cycles (){
+        return cycles;
+    }
 
     private Vector<File> getParents(File file) {
         Vector<File> parents = new Vector<>();
@@ -15,8 +25,10 @@ public class Graph {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 if (line.startsWith("require")) {
-                    parents.add(new File(dirPath + line.split("‘")[1].split("’")[0]));
-                    System.out.println("please " + parents.get(parents.size() - 1));
+                    File parent = new File(dirPath + line.split("‘")[1].split("’")[0]);
+                    if (numberInGraph.containsKey(parent)) {
+                        parents.add(parent);
+                    }
                 }
             }
             scanner.close();
@@ -31,15 +43,9 @@ public class Graph {
         dirPath = path;
         AdjList = new Vector<>();
         numberInGraph = new HashMap<>();
-        for (File file : files) {
-            Vector<File> parents = getParents(file);
-            for (File parent : parents) {
-                System.out.println(file.getName() + " depends on " + parent.getName());
-            }
-        }
     }
 
-    public Stack<File> getSortedFiles(){
+    public Stack<File> getSortedFiles() {
         buildGraph();
         return topologicalSortHandler();
     }
@@ -50,19 +56,11 @@ public class Graph {
             numberInGraph.put(files.elementAt(i), i);
             AdjList.set(i, new Vector<>());
         }
-        System.out.println(numberInGraph.toString());
 
         for (File file : files) {
             Vector<File> parents = getParents(file);
             for (File parent : parents) {
-                // System.out.print(parent + " $ " + numberInGraph.get(parent) + "\n");
                 AdjList.get(numberInGraph.get(file)).add(numberInGraph.get(parent));
-            }
-        }
-        for (int i = 0; i < AdjList.size(); i++) {
-            System.out.println(i + ":");
-            for (var el : AdjList.get(i)) {
-                System.out.print(el + " ");
             }
         }
     }
@@ -81,9 +79,9 @@ public class Graph {
         stack.push(node);
     }
 
-    Stack<File> integersToFiles(Stack<Integer> stack){
-        Stack <File> sortedFiles = new Stack<>();
-        while (!stack.empty()){
+    Stack<File> integersToFiles(Stack<Integer> stack) {
+        Stack<File> sortedFiles = new Stack<>();
+        while (!stack.empty()) {
             sortedFiles.push(files.get(stack.pop()));
         }
         return sortedFiles;
@@ -104,6 +102,23 @@ public class Graph {
                 topologicalSortIteration(i, colour, stack);
             }
         }
+        if (check_cycle(stack)){
+            return new Stack<>();
+        }
         return integersToFiles(stack);
+    }
+
+    boolean check_cycle(Stack<Integer> numbers) {
+        for (int startNode = 0; startNode < AdjList.size(); startNode++) {
+            for (Integer targetNode : AdjList.get(startNode)){
+                if (numbers.indexOf(targetNode) > numbers.indexOf(startNode)){
+                    cycles = true;
+                    problemFile1 = files.get(startNode);
+                    problemFile2 = files.get(targetNode);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
