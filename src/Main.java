@@ -1,6 +1,7 @@
 import java.io.File;
 import java.util.MissingFormatArgumentException;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Main {
     public static void main(String[] args) throws MissingFormatArgumentException {
@@ -11,11 +12,12 @@ public class Main {
             throw new MissingFormatArgumentException("Wrong input path\n");
         }
         FileHandler fileHandler = new FileHandler(inputPath);
-        var res = fileHandler.txtCollector(fileHandler.rootFile);
-        for (File f : res) {
+        var collectedTxt = fileHandler.txtCollector(fileHandler.rootFile);
+        for (File f : collectedTxt) {
             System.out.println(f.getName());
         }
-        Graph graph = new Graph(res, inputPath);
-
+        Graph graph = new Graph(collectedTxt, inputPath);
+        graph.topologicalSortHandler();
+        Stack<Integer> sortedFiles = graph.getSortedFiles();
     }
 }
